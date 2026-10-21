@@ -43,7 +43,12 @@
   <canvas id="effectcraft_canvas"></canvas>
   <div id="loading"><img src="favicon.svg" alt=""><div id="status">Loading EffectCraft…</div></div>
   <script type="module">
-    import init, * as ec from "./effectcraft_web.js";
+    // ?webgl: hide WebGPU from the page so the app starts on WebGL2 and renders on the CPU
+    // (for GPU drivers that lose the WebGPU device). Use it with ?nogpuworkers.
+    if (new URLSearchParams(location.search).has("webgl")) {
+      try { Object.defineProperty(Navigator.prototype, "gpu", { get: () => undefined, configurable: true }); } catch {}
+    }
+    const { default: init, ...ec } = await import("./effectcraft_web.js");
     const t0 = performance.now();
     window.effectcraftLoad = {};
     // The agent / test API: the desktop control channel as promises (docs/web.md).
